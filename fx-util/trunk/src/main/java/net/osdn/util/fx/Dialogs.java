@@ -104,6 +104,10 @@ public class Dialogs {
 	public static ButtonType show(AlertType type, final Window owner, Image icon, String title, String message, Map<ButtonType, String> captions) {
 		final Alert dialog = new Alert(type);
 		
+		if(owner != null && owner.getScene() != null) {
+			dialog.initOwner(owner);
+		}
+		
 		if(owner instanceof Stage) {
 			ObservableList<Image> icons = ((Stage)owner).getIcons();
 			if(icons != null && icons.size() > 0) {
