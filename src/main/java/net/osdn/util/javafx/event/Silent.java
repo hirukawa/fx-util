@@ -22,6 +22,7 @@ public interface Silent<T extends Event> {
 		};
 	}
 
+	@SuppressWarnings("serial")
 	class WrappedException extends RuntimeException {
 		public WrappedException(Exception cause) {
 			super(cause);

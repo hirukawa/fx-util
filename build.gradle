@@ -1,12 +1,12 @@
 apply plugin: 'java'
 
 archivesBaseName = 'fx-util'
-version = '0.2.0'
+version = '0.2.1'
 
 tasks.withType(JavaCompile) {
 	sourceCompatibility = 11
 	targetCompatibility = 11
-	options.compilerArgs << '-Xlint:unchecked'
+	options.compilerArgs << '-Xlint:all'
 }
 
 def defaultEncoding = 'UTF-8'
