@@ -1,13 +1,12 @@
 apply plugin: 'java'
-apply plugin: 'eclipse'
 
 archivesBaseName = 'fx-util'
-version = '0.1.1'
+version = '0.2.0'
 
 tasks.withType(JavaCompile) {
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
-    compileJava.options.bootClasspath = "$System.env.JAVA_HOME/jre/lib/rt.jar"
+	sourceCompatibility = 11
+	targetCompatibility = 11
+	options.compilerArgs << '-Xlint:unchecked'
 }
 
 def defaultEncoding = 'UTF-8'
@@ -25,34 +24,25 @@ repositories {
 }
 
 dependencies {
-	compile fileTree(dir: 'libs', include: ['**/*.jar'], excludes: ['**/*-sources.jar', '**/*-javadoc.jar'])
+	compile fileTree(dir: 'lib',
+			includes: ['**/*.jar'],
+			excludes: ['**/*-sources.jar', '**/*-javadoc.jar'])
 }
 
-jar {
-	exclude('img/*.psd')
-}
-
-defaultTasks 'clean', 'build', 'jarProperties'
+defaultTasks 'clean', 'build'
 
 task sourcesJar(type: Jar, dependsOn: classes) {
 	setGroup('build')
 	setDescription('Assembles a jar archive containing the main source code.')
-    classifier = 'sources'
+	archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-	setGroup('documentation')
+	setGroup('build')
 	setDescription('Generates Javadoc API documentation as a jar archive.')
-    classifier = 'javadoc'
+	archiveClassifier = 'javadoc'
     from javadoc.destinationDir
-}
-
-task jarProperties(dependsOn: [sourcesJar, javadocJar]) << {
-	def f = file("${buildDir}/libs/${archivesBaseName}-${version}.jar.properties")
-	f.getParentFile().mkdirs();
-	f.write("src=${archivesBaseName}-${version}-sources.jar\n", 'UTF-8')
-	f.append("doc=${archivesBaseName}-${version}-javadoc.jar\n", 'UTF-8')
 }
 
 artifacts {
