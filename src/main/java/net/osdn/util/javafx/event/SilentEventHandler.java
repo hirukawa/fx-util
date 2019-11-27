@@ -4,10 +4,10 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 
 @FunctionalInterface
-public interface Silent<T extends Event> {
+public interface SilentEventHandler<T extends Event> {
 	void handle(T event) throws Exception;
 
-	static <T extends Event> EventHandler<T> wrap(Silent<T> handler) {
+	static <T extends Event> EventHandler<T> wrap(SilentEventHandler<T> handler) {
 		return event -> {
 			try {
 				handler.handle(event);
@@ -17,15 +17,8 @@ public interface Silent<T extends Event> {
 					ueh.uncaughtException(Thread.currentThread(), e);
 					return;
 				}
-				throw new Silent.WrappedException(e);
+				throw new SilentWrappedException(e);
 			}
 		};
-	}
-
-	@SuppressWarnings("serial")
-	class WrappedException extends RuntimeException {
-		public WrappedException(Exception cause) {
-			super(cause);
-		}
 	}
 }
