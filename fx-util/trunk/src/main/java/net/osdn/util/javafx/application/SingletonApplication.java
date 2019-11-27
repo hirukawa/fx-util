@@ -4,12 +4,16 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 import javafx.util.Duration;
+import net.osdn.util.javafx.event.SilentCallback;
+import net.osdn.util.javafx.event.SilentEventHandler;
 
-import java.awt.*;
+import java.awt.SplashScreen;
 import java.lang.reflect.Constructor;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -99,6 +103,16 @@ public abstract class SingletonApplication extends Application {
 
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    @SuppressWarnings("overloads")
+    protected <T extends Event> EventHandler<T> wrap(SilentEventHandler<T> handler) {
+        return SilentEventHandler.wrap(handler);
+    }
+
+    @SuppressWarnings("overloads")
+    protected <P, R> Callback<P, R> wrap(SilentCallback<P, R> callback) {
+        return SilentCallback.wrap(callback);
     }
 
     public static class Interceptor extends Application {
