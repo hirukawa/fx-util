@@ -4,6 +4,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
@@ -11,7 +13,11 @@ import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import net.osdn.util.javafx.event.SilentCallback;
+import net.osdn.util.javafx.event.SilentChangeListener;
+import net.osdn.util.javafx.event.SilentChangeListenerNewValueOnly;
+import net.osdn.util.javafx.event.SilentChangeListenerWithoutObservable;
 import net.osdn.util.javafx.event.SilentEventHandler;
+import net.osdn.util.javafx.event.SilentInvalidationListener;
 
 import java.awt.SplashScreen;
 import java.lang.reflect.Constructor;
@@ -113,6 +119,26 @@ public abstract class SingletonApplication extends Application {
     @SuppressWarnings("overloads")
     protected <P, R> Callback<P, R> wrap(SilentCallback<P, R> callback) {
         return SilentCallback.wrap(callback);
+    }
+
+    @SuppressWarnings("overloads")
+    protected <T> ChangeListener<T> wrap(SilentChangeListener<T> listener) {
+        return SilentChangeListener.wrap(listener);
+    }
+
+    @SuppressWarnings("overloads")
+    protected <T> ChangeListener<T> wrap(SilentChangeListenerWithoutObservable<T> listener) {
+        return SilentChangeListenerWithoutObservable.wrap(listener);
+    }
+
+    @SuppressWarnings("overloads")
+    protected <T> ChangeListener<T> wrap(SilentChangeListenerNewValueOnly<T> listener) {
+        return SilentChangeListenerNewValueOnly.wrap(listener);
+    }
+
+    @SuppressWarnings("overloads")
+    protected InvalidationListener wrap(SilentInvalidationListener listener) {
+        return SilentInvalidationListener.wrap(listener);
     }
 
     public static class Interceptor extends Application {
