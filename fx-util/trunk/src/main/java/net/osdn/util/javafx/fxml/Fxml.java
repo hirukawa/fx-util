@@ -1,4 +1,4 @@
-package net.osdn.util.fx;
+package net.osdn.util.javafx.fxml;
 
 import javafx.fxml.FXMLLoader;
 
