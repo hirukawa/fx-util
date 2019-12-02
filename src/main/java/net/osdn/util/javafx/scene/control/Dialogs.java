@@ -108,11 +108,11 @@ public class Dialogs {
 			dialog.getDialogPane().layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
 				@Override
 				public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-					if(dialog.getWidth() > 0 && dialog.getHeight() > 0) {
+					if(newValue != null && newValue.getWidth() > 0 && newValue.getHeight() > 0) {
 						double x = owner.getX() + owner.getWidth() / 2;
 						double y = owner.getY() + owner.getHeight() / 2;
-						dialog.setX(x - dialog.getWidth() / 2);
-						dialog.setY(y - dialog.getHeight() / 2);
+						dialog.setX(x - newValue.getWidth() / 2);
+						dialog.setY(y - newValue.getHeight() / 2);
 						dialog.getDialogPane().layoutBoundsProperty().removeListener(this);
 					}
 				}
