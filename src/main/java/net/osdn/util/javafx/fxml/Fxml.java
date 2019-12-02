@@ -16,4 +16,29 @@ public class Fxml {
             throw new UncheckedIOException(e);
         }
     }
+
+    public static <T> T load(Object controller, String fxmlFilename) {
+        FXMLLoader loader = new FXMLLoader(controller.getClass().getResource(fxmlFilename));
+        loader.setController(controller);
+        try {
+            return loader.load();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T load(String fxmlFilename) {
+        Class<?> callerClass;
+        try {
+            callerClass = Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
+        } catch(ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(callerClass.getResource(fxmlFilename));
+            return loader.load();
+        } catch(IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 }
