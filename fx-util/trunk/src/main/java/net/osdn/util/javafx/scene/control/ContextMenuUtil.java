@@ -133,6 +133,9 @@ public class ContextMenuUtil {
 						}
 					});
 				}
+				// コンテキスト・メニュー表示時になぜか先頭のアイテムが選択状態になることがあるようなので、
+				// コンテキスト・メニュー自体にフォーカス要求を出して、先頭アイテムが初期選択状態にならないようにします。
+				contextMenuNode.requestFocus();
 				contextMenu.removeEventHandler(WindowEvent.WINDOW_SHOWING, this);
 			}
 		};
