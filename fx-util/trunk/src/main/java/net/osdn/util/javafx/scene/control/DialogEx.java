@@ -6,10 +6,13 @@ import javafx.beans.binding.IntegerBinding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.control.Dialog;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
 import net.osdn.util.javafx.event.SilentCallback;
@@ -22,7 +25,14 @@ import net.osdn.util.javafx.event.SilentInvalidationListener;
 public class DialogEx<R> extends Dialog<R> {
 
 	public DialogEx(Window owner) {
-
+		if(owner instanceof Stage) {
+			Stage stage = (Stage)getDialogPane().getScene().getWindow();
+			ObservableList<Image> icons = ((Stage)owner).getIcons();
+			if (icons != null && icons.size() > 0) {
+				stage.getIcons().add(icons.get(0));
+			}
+			stage.setTitle(((Stage)owner).getTitle());
+		}
 		if(owner != null) {
 			getDialogPane().layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
 				@Override
