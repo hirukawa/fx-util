@@ -65,6 +65,10 @@ public abstract class SingletonApplication extends Application {
     }
 
     public static void launch(String... args) {
+        if(SingletonApplication.appClass != null) {
+            launch(appClass, args);
+            return;
+        }
         try {
             String callingClassName = findCallingClassName();
             Class<?> theClass = Class.forName(callingClassName, false,
