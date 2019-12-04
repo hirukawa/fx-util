@@ -15,12 +15,16 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import net.osdn.util.javafx.event.SilentCallable;
 import net.osdn.util.javafx.event.SilentCallback;
 import net.osdn.util.javafx.event.SilentChangeListener;
 import net.osdn.util.javafx.event.SilentChangeListenerNewValueOnly;
 import net.osdn.util.javafx.event.SilentChangeListenerWithoutObservable;
 import net.osdn.util.javafx.event.SilentEventHandler;
 import net.osdn.util.javafx.event.SilentInvalidationListener;
+import net.osdn.util.javafx.event.SilentRunnable;
+
+import java.util.concurrent.Callable;
 
 public class DialogEx<R> extends Dialog<R> {
 
@@ -77,5 +81,15 @@ public class DialogEx<R> extends Dialog<R> {
 	@SuppressWarnings("overloads")
 	protected InvalidationListener wrap(SilentInvalidationListener listener) {
 		return SilentInvalidationListener.wrap(listener);
+	}
+
+	@SuppressWarnings("overloads")
+	protected Runnable wrap(SilentRunnable runnable) {
+		return SilentRunnable.wrap(runnable);
+	}
+
+	@SuppressWarnings("overloads")
+	protected <V> Callable<V> wrap(SilentCallable<V> callable) {
+		return SilentCallable.wrap(callable);
 	}
 }
