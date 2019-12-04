@@ -12,17 +12,20 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import net.osdn.util.javafx.event.SilentCallable;
 import net.osdn.util.javafx.event.SilentCallback;
 import net.osdn.util.javafx.event.SilentChangeListener;
 import net.osdn.util.javafx.event.SilentChangeListenerNewValueOnly;
 import net.osdn.util.javafx.event.SilentChangeListenerWithoutObservable;
 import net.osdn.util.javafx.event.SilentEventHandler;
 import net.osdn.util.javafx.event.SilentInvalidationListener;
+import net.osdn.util.javafx.event.SilentRunnable;
 
 import java.awt.SplashScreen;
 import java.lang.reflect.Constructor;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -139,6 +142,16 @@ public abstract class SingletonApplication extends Application {
     @SuppressWarnings("overloads")
     protected InvalidationListener wrap(SilentInvalidationListener listener) {
         return SilentInvalidationListener.wrap(listener);
+    }
+
+    @SuppressWarnings("overloads")
+    protected Runnable wrap(SilentRunnable runnable) {
+        return SilentRunnable.wrap(runnable);
+    }
+
+    @SuppressWarnings("overloads")
+    protected <V> Callable<V> wrap(SilentCallable<V> callable) {
+        return SilentCallable.wrap(callable);
     }
 
     public static class Interceptor extends Application {
