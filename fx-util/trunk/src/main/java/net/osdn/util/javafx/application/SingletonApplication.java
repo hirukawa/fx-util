@@ -177,7 +177,9 @@ public abstract class SingletonApplication extends Application {
             stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent windowEvent) {
-                    closeSplashScreen();
+                    Platform.runLater(() -> {
+                        closeSplashScreen();
+                    });
                     primaryStage.removeEventHandler(windowEvent.getEventType(), this);
                 }
             });

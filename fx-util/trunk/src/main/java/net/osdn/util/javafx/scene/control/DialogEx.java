@@ -1,16 +1,16 @@
 package net.osdn.util.javafx.scene.control;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.IntegerBinding;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -51,6 +51,23 @@ public class DialogEx<R> extends Dialog<R> {
 				}
 			});
 		}
+
+		showingProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(newValue) {
+					DialogPane dialogPane = getDialogPane();
+					for(ButtonType buttonType : dialogPane.getButtonTypes()) {
+						String text = Dialogs.buttonTexts.get(buttonType);
+						if(text != null) {
+							Button button = (Button)dialogPane.lookupButton(buttonType);
+							button.setText(text);
+						}
+					}
+				}
+				showingProperty().removeListener(this);
+			}
+		});
 	}
 
 	@SuppressWarnings("overloads")
