@@ -7,11 +7,15 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
@@ -57,6 +61,8 @@ public class DialogEx<R> extends Dialog<R> {
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if(newValue) {
 					DialogPane dialogPane = getDialogPane();
+
+					//ボタンのテキストを controls.properties の設定で上書きします。
 					for(ButtonType buttonType : dialogPane.getButtonTypes()) {
 						String text = Dialogs.buttonTexts.get(buttonType);
 						if(text != null) {
@@ -64,11 +70,43 @@ public class DialogEx<R> extends Dialog<R> {
 							button.setText(text);
 						}
 					}
+
+					//ボタンバーにボタンが配置されていない場合、ボタンバーのパディングを 0 にします。
+					if(dialogPane.getButtonTypes().size() == 0) {
+						Node buttonBarContainer = dialogPane.lookup(".button-bar > .container");
+						if(buttonBarContainer instanceof Region) {
+							Region region = (Region)buttonBarContainer;
+							((Region)buttonBarContainer).setPadding(Insets.EMPTY);
+							//ボタンバーのパディングがなくなった分だけダイアログのサイズとコンテンツのサイズに差異がでます。
+							//コンテンツのサイズにダイアログのサイズを合わせるために sizeToScene を呼び出します。
+							sizeToScene();
+						}
+					}
 				}
 				showingProperty().removeListener(this);
 			}
 		});
 	}
+
+	/**
+	 * このダイアログの幅と高さを、このダイアログのコンテンツ・サイズに一致するように設定します。
+	 */
+	public void sizeToScene() {
+		DialogPane dialogPane = getDialogPane();
+		if(dialogPane == null) {
+			return;
+		}
+		Scene scene = dialogPane.getScene();
+		if(scene == null) {
+			return;
+		}
+		Window window = scene.getWindow();
+		if(window == null) {
+			return;
+		}
+		window.sizeToScene();
+	}
+
 
 	@SuppressWarnings("overloads")
 	protected <T extends Event> EventHandler<T> wrap(SilentEventHandler<T> handler) {
