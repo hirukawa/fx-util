@@ -8,6 +8,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,6 +17,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
@@ -63,6 +65,7 @@ public class DialogEx<R> extends Dialog<R> {
 					DialogPane dialogPane = getDialogPane();
 
 					//ボタンのテキストを controls.properties の設定で上書きします。
+					//この処理は初回のみ実行されます。リスナーが解除されるので 2回目以降の表示時には何もしません。
 					for(ButtonType buttonType : dialogPane.getButtonTypes()) {
 						String text = Dialogs.buttonTexts.get(buttonType);
 						if(text != null) {
@@ -72,6 +75,56 @@ public class DialogEx<R> extends Dialog<R> {
 					}
 				}
 				showingProperty().removeListener(this);
+			}
+		});
+
+		showingProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (newValue) {
+					//ダイアログがワークエリアに収まるように位置を調整します。
+					//この処理はダイアログを表示するたびに実行されます。このリスナーは解除されません。
+					Rectangle2D workarea = Screen.getPrimary().getVisualBounds();
+
+					double x = getX();
+					double y = getY();
+					if(owner != null) {
+						x = owner.getX() + owner.getWidth() / 2 - getWidth() / 2;
+						y = owner.getY() + owner.getHeight() / 2 - getHeight() / 2;
+					}
+					double w = getWidth();
+					double h = getHeight();
+					if(x + w > workarea.getMaxX()) {
+						x = workarea.getMaxX() - w;
+					}
+					if(x < workarea.getMinX()) {
+						x = workarea.getMinX();
+					}
+					if(x + w > workarea.getMaxX()) {
+						w = workarea.getMaxX() - x;
+					}
+					if(y + h > workarea.getMaxY()) {
+						y = workarea.getMaxY() - h;
+					}
+					if(y < workarea.getMinY()) {
+						y = workarea.getMinY();
+					}
+					if(y + h > workarea.getMaxY()) {
+						h = workarea.getMaxY() - y;
+					}
+					if(x != getX()) {
+						setX(x);
+					}
+					if (y != getY()) {
+						setY(y);
+					}
+					if(w != getWidth()) {
+						setWidth(w);
+					}
+					if(h != getHeight()) {
+						setHeight(h);
+					}
+				}
 			}
 		});
 	}
