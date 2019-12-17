@@ -42,6 +42,6 @@ public interface AsyncCallable<V> {
 
 	@FunctionalInterface
 	public interface Success<T> {
-		void onSucceeded(T result);
+		void onSucceeded(T result) throws Exception;
 	}
 }

@@ -1,7 +1,10 @@
 package net.osdn.util.javafx.concurrent;
 
 import javafx.concurrent.Task;
+import net.osdn.util.javafx.event.SilentRunnable;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -94,7 +97,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 	 * @param runnable 非同期で実行する処理
 	 * @return メソッドチェーンでハンドラーを設定できます。
 	 */
-	public static AsyncRunnable execute(Runnable runnable) {
+	public static AsyncRunnable execute(SilentRunnable runnable) {
 		Async<Void> async = new Async<Void>(() -> {
 			runnable.run();
 			return null;
@@ -149,31 +152,100 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 	}
 
 	protected void cancelled() {
-		if(cancel != null) {
-			cancel.onCancelled();
-		}
-		if(complete != null) {
-			complete.onCompleted(Async.State.CANCELLED);
+		Exception exception = null;
+		try {
+			if (cancel != null) {
+				cancel.onCancelled();
+			}
+		} catch(Exception e) {
+			exception = e;
+		} finally {
+			if(complete != null) {
+				try {
+					complete.onCompleted(State.CANCELLED);
+				} catch(Exception e) {
+					if(exception == null) {
+						exception = e;
+					}
+				}
+			}
+			if(exception != null) {
+				if(exception instanceof RuntimeException) {
+					throw (RuntimeException)exception;
+				} else if(exception instanceof IOException) {
+					throw new UncheckedIOException((IOException)exception);
+				} else {
+					throw new RuntimeException(exception);
+				}
+			}
 		}
 	}
 
 	protected void succeeded() {
-		if(runnableSuccess != null) {
-			runnableSuccess.onSucceeded();
-		} else if(callableSuccess != null) {
-			callableSuccess.onSucceeded(task.getValue());
-		}
-		if(complete != null) {
-			complete.onCompleted(Async.State.SUCCEEDED);
+		Exception exception = null;
+		try {
+			if (runnableSuccess != null) {
+				runnableSuccess.onSucceeded();
+			} else if (callableSuccess != null) {
+				callableSuccess.onSucceeded(task.getValue());
+			}
+		} catch(Exception e) {
+			exception = e;
+		} finally {
+			if(complete != null) {
+				try {
+					complete.onCompleted(State.SUCCEEDED);
+				} catch(Exception e) {
+					if(exception == null) {
+						exception = e;
+					}
+				}
+			}
+			if(exception != null) {
+				if(exception instanceof RuntimeException) {
+					throw (RuntimeException)exception;
+				} else if(exception instanceof IOException) {
+					throw new UncheckedIOException((IOException)exception);
+				} else {
+					throw new RuntimeException(exception);
+				}
+			}
 		}
 	}
 
 	protected void failed() {
-		if(failure != null) {
-			failure.onFailed(task.getException());
+		Throwable t = task.getException();
+		if(t instanceof Error) {
+			throw (Error)t;
 		}
-		if(complete != null) {
-			complete.onCompleted(Async.State.FAILED);
+		Exception exception = null;
+		try {
+			if (failure != null) {
+				failure.onFailed((Exception)t);
+			} else {
+				exception = (Exception)t;
+			}
+		} catch(Exception e) {
+			exception = e;
+		} finally {
+			if(complete != null) {
+				try {
+					complete.onCompleted(State.FAILED);
+				} catch(Exception e) {
+					if(exception == null) {
+						exception = e;
+					}
+				}
+			}
+			if(exception != null) {
+				if(exception instanceof RuntimeException) {
+					throw (RuntimeException)exception;
+				} else if(exception instanceof IOException) {
+					throw new UncheckedIOException((IOException)exception);
+				} else {
+					throw new RuntimeException(exception);
+				}
+			}
 		}
 	}
 
@@ -253,16 +325,16 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 
 	@FunctionalInterface
 	public interface Cancel {
-		void onCancelled();
+		void onCancelled() throws Exception;
 	}
 
 	@FunctionalInterface
 	public interface Failure {
-		void onFailed(Throwable exception);
+		void onFailed(Exception exception) throws Exception;
 	}
 
 	@FunctionalInterface
 	public interface Complete {
-		void onCompleted(State state);
+		void onCompleted(State state) throws Exception;
 	}
 }
