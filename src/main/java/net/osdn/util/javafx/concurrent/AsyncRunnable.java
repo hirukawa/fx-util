@@ -44,6 +44,6 @@ public interface AsyncRunnable {
 
 	@FunctionalInterface
 	public interface Success {
-		void onSucceeded();
+		void onSucceeded() throws Exception;
 	}
 }
