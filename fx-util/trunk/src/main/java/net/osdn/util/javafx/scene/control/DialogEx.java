@@ -70,18 +70,6 @@ public class DialogEx<R> extends Dialog<R> {
 							button.setText(text);
 						}
 					}
-
-					//ボタンバーにボタンが配置されていない場合、ボタンバーのパディングを 0 にします。
-					if(dialogPane.getButtonTypes().size() == 0) {
-						Node buttonBarContainer = dialogPane.lookup(".button-bar > .container");
-						if(buttonBarContainer instanceof Region) {
-							Region region = (Region)buttonBarContainer;
-							((Region)buttonBarContainer).setPadding(Insets.EMPTY);
-							//ボタンバーのパディングがなくなった分だけダイアログのサイズとコンテンツのサイズに差異がでます。
-							//コンテンツのサイズにダイアログのサイズを合わせるために sizeToScene を呼び出します。
-							sizeToScene();
-						}
-					}
 				}
 				showingProperty().removeListener(this);
 			}
