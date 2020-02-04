@@ -3,8 +3,6 @@ package net.osdn.util.javafx.concurrent;
 import javafx.concurrent.Task;
 import net.osdn.util.javafx.event.SilentRunnable;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -170,13 +168,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				if(exception instanceof RuntimeException) {
-					throw (RuntimeException)exception;
-				} else if(exception instanceof IOException) {
-					throw new UncheckedIOException((IOException)exception);
-				} else {
-					throw new RuntimeException(exception);
-				}
+				throw new AsyncWrappedException(exception);
 			}
 		}
 	}
@@ -202,13 +194,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				if(exception instanceof RuntimeException) {
-					throw (RuntimeException)exception;
-				} else if(exception instanceof IOException) {
-					throw new UncheckedIOException((IOException)exception);
-				} else {
-					throw new RuntimeException(exception);
-				}
+				throw new AsyncWrappedException(exception);
 			}
 		}
 	}
@@ -238,13 +224,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				if(exception instanceof RuntimeException) {
-					throw (RuntimeException)exception;
-				} else if(exception instanceof IOException) {
-					throw new UncheckedIOException((IOException)exception);
-				} else {
-					throw new RuntimeException(exception);
-				}
+				throw new AsyncWrappedException(exception);
 			}
 		}
 	}
