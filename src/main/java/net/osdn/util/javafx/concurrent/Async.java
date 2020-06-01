@@ -168,7 +168,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				throw new AsyncWrappedException(exception);
+				rethrow(exception);
 			}
 		}
 	}
@@ -194,7 +194,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				throw new AsyncWrappedException(exception);
+				rethrow(exception);
 			}
 		}
 	}
@@ -224,7 +224,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				throw new AsyncWrappedException(exception);
+				rethrow(exception);
 			}
 		}
 	}
@@ -316,5 +316,14 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 	@FunctionalInterface
 	public interface Complete {
 		void onCompleted(State state) throws Exception;
+	}
+
+	static void rethrow(Throwable throwable) {
+		rethrow0(throwable);
+	}
+
+	@SuppressWarnings("unchecked")
+	static <T extends Throwable> void rethrow0(Throwable throwable) throws T {
+		throw (T)throwable;
 	}
 }

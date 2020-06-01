@@ -13,9 +13,18 @@ public interface SilentRunnable {
 				if (ueh != null) {
 					ueh.uncaughtException(Thread.currentThread(), e);
 				} else {
-					throw new SilentWrappedException(e);
+					rethrow(e);
 				}
 			}
 		};
+	}
+
+	static void rethrow(Throwable throwable) {
+		rethrow0(throwable);
+	}
+
+	@SuppressWarnings("unchecked")
+	static <T extends Throwable> void rethrow0(Throwable throwable) throws T {
+		throw (T)throwable;
 	}
 }

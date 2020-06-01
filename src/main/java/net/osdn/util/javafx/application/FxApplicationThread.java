@@ -51,10 +51,13 @@ public class FxApplicationThread {
 	 * このメソッドの呼び出し自体はブロックされることなくすぐに復帰します。
 	 * このメソッドは JavaFX アプリケーション・スレッドから呼び出してください。</p>
 	 *
-	 * @param delay Runnable を実行するまでの時間
+	 * @param delay Runnable を実行するまでの時間。0ミリ秒以下の値を指定した場合、1ミリ秒後に実行されます。
 	 * @param runnable run メソッドが JavaFX アプリケーション・スレッドで実行される Runnable
 	 */
 	public static void runLater(Duration delay, Runnable runnable) {
+		if(delay.lessThanOrEqualTo(Duration.ZERO)) {
+			delay = Duration.ONE;
+		}
 		new Timeline(new KeyFrame(delay, onFinished -> {
 			runnable.run();
 		})).play();
