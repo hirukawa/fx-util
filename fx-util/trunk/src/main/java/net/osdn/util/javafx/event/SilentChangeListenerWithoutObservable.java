@@ -14,10 +14,20 @@ public interface SilentChangeListenerWithoutObservable<T> {
 				Thread.UncaughtExceptionHandler ueh = Thread.currentThread().getUncaughtExceptionHandler();
 				if(ueh != null) {
 					ueh.uncaughtException(Thread.currentThread(), e);
-					return;
+				} else {
+					rethrow(e);
 				}
-				throw new SilentWrappedException(e);
+				return;
 			}
 		};
+	}
+
+	static void rethrow(Throwable throwable) {
+		rethrow0(throwable);
+	}
+
+	@SuppressWarnings("unchecked")
+	static <T extends Throwable> void rethrow0(Throwable throwable) throws T {
+		throw (T)throwable;
 	}
 }
