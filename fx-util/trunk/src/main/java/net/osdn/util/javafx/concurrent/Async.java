@@ -168,7 +168,12 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				rethrow(exception);
+				Thread.UncaughtExceptionHandler ueh = Thread.currentThread().getUncaughtExceptionHandler();
+				if(ueh != null) {
+					ueh.uncaughtException(Thread.currentThread(), exception);
+				} else {
+					throw new AsyncWrappedException(exception);
+				}
 			}
 		}
 	}
@@ -194,7 +199,12 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				rethrow(exception);
+				Thread.UncaughtExceptionHandler ueh = Thread.currentThread().getUncaughtExceptionHandler();
+				if(ueh != null) {
+					ueh.uncaughtException(Thread.currentThread(), exception);
+				} else {
+					throw new AsyncWrappedException(exception);
+				}
 			}
 		}
 	}
@@ -224,7 +234,12 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 				}
 			}
 			if(exception != null) {
-				rethrow(exception);
+				Thread.UncaughtExceptionHandler ueh = Thread.currentThread().getUncaughtExceptionHandler();
+				if(ueh != null) {
+					ueh.uncaughtException(Thread.currentThread(), exception);
+				} else {
+					throw new AsyncWrappedException(exception);
+				}
 			}
 		}
 	}
@@ -316,14 +331,5 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 	@FunctionalInterface
 	public interface Complete {
 		void onCompleted(State state) throws Exception;
-	}
-
-	static void rethrow(Throwable throwable) {
-		rethrow0(throwable);
-	}
-
-	@SuppressWarnings("unchecked")
-	static <T extends Throwable> void rethrow0(Throwable throwable) throws T {
-		throw (T)throwable;
 	}
 }
