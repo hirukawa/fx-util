@@ -150,18 +150,18 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 	}
 
 	protected void cancelled() {
-		Exception exception = null;
+		Throwable exception = null;
 		try {
 			if (cancel != null) {
 				cancel.onCancelled();
 			}
-		} catch(Exception e) {
+		} catch(Throwable e) {
 			exception = e;
 		} finally {
 			if(complete != null) {
 				try {
 					complete.onCompleted(State.CANCELLED);
-				} catch(Exception e) {
+				} catch(Throwable e) {
 					if(exception == null) {
 						exception = e;
 					}
@@ -179,20 +179,20 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 	}
 
 	protected void succeeded() {
-		Exception exception = null;
+		Throwable exception = null;
 		try {
 			if (runnableSuccess != null) {
 				runnableSuccess.onSucceeded();
 			} else if (callableSuccess != null) {
 				callableSuccess.onSucceeded(task.getValue());
 			}
-		} catch(Exception e) {
+		} catch(Throwable e) {
 			exception = e;
 		} finally {
 			if(complete != null) {
 				try {
 					complete.onCompleted(State.SUCCEEDED);
-				} catch(Exception e) {
+				} catch(Throwable e) {
 					if(exception == null) {
 						exception = e;
 					}
@@ -210,24 +210,20 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 	}
 
 	protected void failed() {
-		Throwable t = task.getException();
-		if(t instanceof Error) {
-			throw (Error)t;
-		}
-		Exception exception = null;
+		Throwable exception = null;
 		try {
 			if (failure != null) {
-				failure.onFailed((Exception)t);
+				failure.onFailed(task.getException());
 			} else {
-				exception = (Exception)t;
+				exception = task.getException();
 			}
-		} catch(Exception e) {
+		} catch(Throwable e) {
 			exception = e;
 		} finally {
 			if(complete != null) {
 				try {
 					complete.onCompleted(State.FAILED);
-				} catch(Exception e) {
+				} catch(Throwable e) {
 					if(exception == null) {
 						exception = e;
 					}
@@ -325,7 +321,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 
 	@FunctionalInterface
 	public interface Failure {
-		void onFailed(Exception exception) throws Exception;
+		void onFailed(Throwable exception) throws Exception;
 	}
 
 	@FunctionalInterface

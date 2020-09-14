@@ -2,8 +2,12 @@ package net.osdn.util.javafx.stage;
 
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
+import javafx.scene.control.Control;
+import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.util.prefs.Preferences;
 
@@ -78,5 +82,36 @@ public class StageUtil {
 		stage.maximizedProperty().addListener((observable, oldValue, newValue) -> {
 			preferences.putBoolean("stageMaximized", newValue.booleanValue());
 		});
+	}
+
+	/** 指定サイズのSceneが収まるようにStageの最小サイズを設定します。
+	 *
+	 * StageのsetMinWidth, setMinHeightで指定した場合、Sceneを内包するのに適切なサイズになりません。
+	 * たとえば、Windows 10 で Stage.setMinWidth(1360) と設定した場合、ウィンドウの幅は 1346 になってしまいます。
+	 * これはウィンドウボーダーを考慮しても小さくなりすぎています。
+	 *
+	 * この問題を回避するために、内包する Scene にサイズを設定した後、Stage の sizeToScene で Stage のサイズを Scene に合わせます。
+	 * この Stage のサイズを最小サイズとして設定することで、Scene を収めるのに最適なサイズが設定されます。
+	 *
+	 * @param stage ステージ
+	 * @param width ステージ内側の最小の幅
+	 * @param height ステージ内側の最小の高さ
+	 */
+	public static void setMinSize(Stage stage, int width, int height) {
+		Region r = new Region();
+		r.setPrefSize(width, height);
+		r.setMinSize(Control.USE_PREF_SIZE, Control.USE_PREF_SIZE);
+		r.setMaxSize(Control.USE_PREF_SIZE, Control.USE_PREF_SIZE);
+		Scene scene = new Scene(r);
+		Stage dummy = new Stage(stage.getStyle());
+		dummy.setScene(scene);
+		dummy.setOpacity(0.0);
+		dummy.show();
+		dummy.sizeToScene();
+		double minWidth = dummy.getWidth();
+		double minHeight = dummy.getHeight();
+		dummy.hide();
+		stage.setMinWidth(minWidth);
+		stage.setMinHeight(minHeight);
 	}
 }

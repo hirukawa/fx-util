@@ -11,10 +11,63 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 public class Fxml {
+
+    public static <T> T load(Class<?> cls) {
+        String fxmlFilename = cls.getSimpleName() + ".fxml";
+        FXMLLoader loader = new FXMLLoader(cls.getResource(fxmlFilename));
+        try {
+            T obj = loader.load();
+            fix(obj);
+            return obj;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T load(Object root, Class<?> cls) {
+        String fxmlFilename = cls.getSimpleName() + ".fxml";
+        FXMLLoader loader = new FXMLLoader(cls.getResource(fxmlFilename));
+        loader.setRoot(root);
+        try {
+            T obj = loader.load();
+            fix(obj);
+            return obj;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static <T> T load(Object controller) {
         String fxmlFilename = controller.getClass().getSimpleName() + ".fxml";
         FXMLLoader loader = new FXMLLoader(controller.getClass().getResource(fxmlFilename));
         loader.setController(controller);
+        try {
+            T obj = loader.load();
+            fix(obj);
+            return obj;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T load(Object root, Object controller) {
+        Class<?> cls = null;
+        if(controller != null) {
+            cls = controller.getClass();
+        } else if(root != null) {
+            cls = root.getClass();
+        } else {
+            throw new NullPointerException();
+        }
+
+        String fxmlFilename = cls.getSimpleName() + ".fxml";
+        FXMLLoader loader = new FXMLLoader(cls.getResource(fxmlFilename));
+        if(root != null) {
+            loader.setRoot(root);
+        }
+        if(controller != null) {
+            loader.setController(controller);
+        }
         try {
             T obj = loader.load();
             fix(obj);
@@ -36,19 +89,28 @@ public class Fxml {
         }
     }
 
-    public static <T> T load(String fxmlFilename) {
-        Class<?> callerClass;
-        try {
-            callerClass = Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
-        } catch(ClassNotFoundException e) {
-            throw new RuntimeException(e);
+    public static <T> T load(Object root, Object controller, String fxmlFilename) {
+        Class<?> cls = null;
+        if(controller != null) {
+            cls = controller.getClass();
+        } else if(root != null) {
+            cls = root.getClass();
+        } else {
+            throw new NullPointerException();
+        }
+
+        FXMLLoader loader = new FXMLLoader(cls.getResource(fxmlFilename));
+        if(root != null) {
+            loader.setRoot(root);
+        }
+        if(controller != null) {
+            loader.setController(controller);
         }
         try {
-            FXMLLoader loader = new FXMLLoader(callerClass.getResource(fxmlFilename));
             T obj = loader.load();
             fix(obj);
             return obj;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
