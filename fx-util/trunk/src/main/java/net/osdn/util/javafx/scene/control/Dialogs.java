@@ -38,7 +38,11 @@ public class Dialogs {
 		keys.put(ButtonType.NEXT, "Dialog.next.button");
 		keys.put(ButtonType.PREVIOUS, "Dialog.previous.button");
 
-		ResourceBundle bundle = ResourceBundle.getBundle(BASE_NAME);
+		ResourceBundle bundle = null;
+		try {
+			bundle = ResourceBundle.getBundle(BASE_NAME);
+		} catch(MissingResourceException ignore) {}
+
 		if(bundle != null) {
 			for(Map.Entry<ButtonType, String> entry : keys.entrySet()) {
 				try {
