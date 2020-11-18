@@ -36,17 +36,52 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class SingletonApplication extends Application {
 
+    private static boolean isImplicitExit = true;
     private static Class<? extends Application> appClass;
     private static AtomicInteger count = new AtomicInteger(0);
     private static CountDownLatch latch = new CountDownLatch(1);
-    private static Stage primaryStage;
+    private static volatile Thread fxApplicationThread;
+    private static volatile Stage primaryStage;
+    private static boolean isStopped = true;
+
+    /** FXアプリケーションスレッド終了時に暗黙的にプロセスを終了するかを示します。
+     * このメソッドが true を返す場合、FXアプリケーション終了時に System.exit(0); が呼び出されます。
+     * 既定値は true です。
+     *
+     * @return 暗黙的にプロセスを終了する場合は true、そうでなければ false。
+     */
+    public static boolean isImplicitExit() {
+        return isImplicitExit;
+    }
+
+    /** FXアプリケーションスレッド終了時に暗黙的にプロセスを終了するかどうかを設定します。
+     * true を設定すると、FXアプリケーション終了時に System.exit(0); が呼び出されます。
+     *
+     * @param implicitExit 暗黙的にプロセスを終了する場合は true、そうでなければ false。
+     */
+    public static void setImplicitExit(boolean implicitExit) {
+        isImplicitExit = implicitExit;
+    }
 
     public static void launch(Class<? extends Application> appClass, String... args) {
         SingletonApplication.appClass = appClass;
         try {
             if(primaryStage == null) {
                 if(count.getAndIncrement() == 0) {
-                    Application.launch(Interceptor.class, args);
+                    isStopped = false;
+                    try {
+                        Application.launch(Interceptor.class, args);
+                        try {
+                            if(fxApplicationThread != null && fxApplicationThread.isAlive()) {
+                                fxApplicationThread.join(1000);
+                            }
+                        } catch(Throwable ignore) {}
+                    } finally {
+                        isStopped = true;
+                    }
+                    if(isImplicitExit) {
+                        System.exit(0);
+                    }
                     return;
                 }
                 latch.await();
@@ -86,6 +121,10 @@ public abstract class SingletonApplication extends Application {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public static boolean isStopped() {
+        return isStopped;
     }
 
     protected static String findCallingClassName() throws ClassNotFoundException {
@@ -173,6 +212,7 @@ public abstract class SingletonApplication extends Application {
 
         @Override
         public void start(Stage stage) throws Exception {
+            fxApplicationThread = Thread.currentThread();
             primaryStage = stage;
             stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>() {
                 @Override
