@@ -78,6 +78,13 @@ public abstract class SingletonApplication extends Application {
                         } catch(Throwable ignore) {}
                     } finally {
                         isStopped = true;
+
+                        try {
+                            SplashScreen splash = SplashScreen.getSplashScreen();
+                            if(splash != null) {
+                                splash.close();
+                            }
+                        } catch(Throwable ignore) {}
                     }
                     if(isImplicitExit) {
                         System.exit(0);
