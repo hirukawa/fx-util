@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class SingletonApplication extends Application {
 
+    private static boolean isWindows = System.getProperty("os.name", "").toLowerCase().startsWith("windows");
     private static boolean isImplicitExit = true;
     private static Class<? extends Application> appClass;
     private static AtomicInteger count = new AtomicInteger(0);
@@ -207,6 +208,14 @@ public abstract class SingletonApplication extends Application {
 
         @Override
         public void init() throws Exception {
+            // Windows以外のOSではすぐにスプラッシュスクリーンを非表示にします。
+            if(!isWindows) {
+                SplashScreen splash = SplashScreen.getSplashScreen();
+                if(splash != null) {
+                    splash.close();
+                }
+            }
+
             app.init();
         }
 
@@ -215,7 +224,6 @@ public abstract class SingletonApplication extends Application {
             fxApplicationThread = Thread.currentThread();
             primaryStage = stage;
 
-            boolean isWindows = System.getProperty("os.name", "").toLowerCase().startsWith("windows");
             if(isWindows) {
                 stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>() {
                     @Override
@@ -226,11 +234,6 @@ public abstract class SingletonApplication extends Application {
                         primaryStage.removeEventHandler(windowEvent.getEventType(), this);
                     }
                 });
-            } else {
-                SplashScreen splash = SplashScreen.getSplashScreen();
-                if(splash != null) {
-                    splash.close();
-                }
             }
             app.start(stage);
             latch.countDown();
