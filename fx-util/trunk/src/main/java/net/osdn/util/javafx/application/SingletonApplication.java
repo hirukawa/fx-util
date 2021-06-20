@@ -214,15 +214,24 @@ public abstract class SingletonApplication extends Application {
         public void start(Stage stage) throws Exception {
             fxApplicationThread = Thread.currentThread();
             primaryStage = stage;
-            stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent windowEvent) {
-                    Platform.runLater(() -> {
-                        closeSplashScreen();
-                    });
-                    primaryStage.removeEventHandler(windowEvent.getEventType(), this);
+
+            boolean isWindows = System.getProperty("os.name", "").toLowerCase().startsWith("windows");
+            if(isWindows) {
+                stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent windowEvent) {
+                        Platform.runLater(() -> {
+                            closeSplashScreen();
+                        });
+                        primaryStage.removeEventHandler(windowEvent.getEventType(), this);
+                    }
+                });
+            } else {
+                SplashScreen splash = SplashScreen.getSplashScreen();
+                if(splash != null) {
+                    splash.close();
                 }
-            });
+            }
             app.start(stage);
             latch.countDown();
         }
