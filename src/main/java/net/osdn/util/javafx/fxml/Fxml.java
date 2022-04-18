@@ -5,7 +5,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.TextInputControl;
 import net.osdn.util.javafx.scene.control.ContextMenuUtil;
+import net.osdn.util.javafx.scene.control.HiDpiFixedInputMethodRequests;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -210,6 +212,8 @@ public class Fxml {
             ContextMenuUtil.fix((MenuBar) obj);
         } else if (obj instanceof ContextMenu) {
             ContextMenuUtil.fix((ContextMenu) obj);
+        } else if (obj instanceof TextInputControl) {
+            HiDpiFixedInputMethodRequests.fix((TextInputControl) obj);
         } else if (obj instanceof Parent) {
             for (Node child : ((Parent) obj).getChildrenUnmodifiable()) {
                 fix(child);
