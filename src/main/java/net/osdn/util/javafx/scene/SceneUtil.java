@@ -16,21 +16,21 @@ public class SceneUtil {
 			throw new NullPointerException();
 		}
 
+		if(runnable == null) {
+			throw new NullPointerException();
+		}
+
 		Scene scene = parent.getScene();
 		if(scene == null) {
 			throw new NullPointerException();
 		}
 
-		scene.addPreLayoutPulseListener(new Runnable() {
+		scene.addPostLayoutPulseListener(new Runnable() {
 			@Override
 			public void run() {
-				if(parent.isNeedsLayout()) {
-					Platform.requestNextPulse();
-				} else {
-					scene.removePreLayoutPulseListener(this);
-					if(runnable != null) {
-						runnable.run();
-					}
+				if(!parent.isNeedsLayout()) {
+					scene.removePostLayoutPulseListener(this);
+					Platform.runLater(runnable);
 				}
 			}
 		});
