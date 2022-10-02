@@ -1,7 +1,7 @@
 package net.osdn.util.javafx.concurrent;
 
 import javafx.concurrent.Task;
-import net.osdn.util.javafx.event.SilentRunnable;
+import net.osdn.util.javafx.Unchecked;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -95,7 +95,7 @@ public class Async<V> implements AsyncRunnable, AsyncCallable<V> {
 	 * @param runnable 非同期で実行する処理
 	 * @return メソッドチェーンでハンドラーを設定できます。
 	 */
-	public static AsyncRunnable execute(SilentRunnable runnable) {
+	public static AsyncRunnable execute(Runnable runnable) {
 		Async<Void> async = new Async<Void>(() -> {
 			runnable.run();
 			return null;
