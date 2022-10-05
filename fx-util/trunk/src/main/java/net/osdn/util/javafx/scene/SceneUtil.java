@@ -44,7 +44,7 @@ public class SceneUtil {
 			public void run() {
 				if(!parent.isNeedsLayout()) {
 					scene.removePostLayoutPulseListener(this);
-					Platform.runLater(runnable);
+					runnable.run();
 				}
 			}
 		});
