@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 public class Unchecked {
 
 	public interface Runnable {
-		void run() throws Throwable;
+		void run() throws Exception;
 	}
 
 	/** 指定したタスクを実行する Runnable を返します。
