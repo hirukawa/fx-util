@@ -1,18 +1,10 @@
 package net.osdn.util.javafx.application;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import javafx.util.Duration;
 
-import java.awt.SplashScreen;
 import java.lang.reflect.Constructor;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,11 +15,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class SingletonApplication extends Application {
 
-    private static boolean isWindows = System.getProperty("os.name", "").toLowerCase().startsWith("windows");
     private static Class<? extends Application> appClass;
     private static AtomicInteger count = new AtomicInteger(0);
     private static CountDownLatch latch = new CountDownLatch(1);
-    private static volatile Thread fxApplicationThread;
     private static volatile Stage primaryStage;
     private static boolean isStopped = true;
 
@@ -39,11 +29,6 @@ public abstract class SingletonApplication extends Application {
                     isStopped = false;
                     try {
                         Application.launch(Interceptor.class, args);
-                        try {
-                            if(fxApplicationThread != null && fxApplicationThread.isAlive()) {
-                                fxApplicationThread.join(1000);
-                            }
-                        } catch(Throwable ignore) {}
                     } finally {
                         isStopped = true;
                     }
@@ -132,33 +117,12 @@ public abstract class SingletonApplication extends Application {
 
         @Override
         public void init() throws Exception {
-            // Windows以外のOSではすぐにスプラッシュスクリーンを非表示にします。
-            if(!isWindows) {
-                SplashScreen splash = SplashScreen.getSplashScreen();
-                if(splash != null) {
-                    splash.close();
-                }
-            }
-
             app.init();
         }
 
         @Override
         public void start(Stage stage) throws Exception {
-            fxApplicationThread = Thread.currentThread();
             primaryStage = stage;
-
-            if(isWindows) {
-                stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>() {
-                    @Override
-                    public void handle(WindowEvent windowEvent) {
-                        Platform.runLater(() -> {
-                            closeSplashScreen();
-                        });
-                        primaryStage.removeEventHandler(windowEvent.getEventType(), this);
-                    }
-                });
-            }
             app.start(stage);
             latch.countDown();
         }
@@ -166,28 +130,6 @@ public abstract class SingletonApplication extends Application {
         @Override
         public void stop() throws Exception {
             app.stop();
-        }
-
-        protected static void closeSplashScreen() {
-            long SPLASH_TIME_MILLIS = 1500;
-
-            SplashScreen splash = SplashScreen.getSplashScreen();
-            if(splash != null) {
-                long startup = 0;
-                String s = System.getProperty("java.application.startup");
-                if(s != null) {
-                    try {
-                        startup = Instant.parse(s).toEpochMilli();
-                    } catch(DateTimeParseException e) {
-                        e.printStackTrace();
-                    }
-                }
-                long elapsed = System.currentTimeMillis() - startup;
-                long delay = Math.max(SPLASH_TIME_MILLIS - elapsed, 1L);
-                new Timeline(new KeyFrame(Duration.millis(delay), onFinished -> {
-                    splash.close();
-                })).play();
-            }
         }
     }
 }
