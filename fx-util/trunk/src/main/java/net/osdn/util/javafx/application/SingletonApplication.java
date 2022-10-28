@@ -19,7 +19,7 @@ public abstract class SingletonApplication extends Application {
     private static AtomicInteger count = new AtomicInteger(0);
     private static CountDownLatch latch = new CountDownLatch(1);
     private static volatile Stage primaryStage;
-    private static boolean isStopped = true;
+    private static volatile boolean isStopped = true;
 
     public static void launch(Class<? extends Application> appClass, String... args) {
         SingletonApplication.appClass = appClass;
