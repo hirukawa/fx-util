@@ -18,12 +18,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class Dialogs {
 
 	protected static final Map<ButtonType, String> buttonTexts = new HashMap<ButtonType, String>();
+	private static double fontSize = 0;
 
 	static {
 		String BASE_NAME = "com/sun/javafx/scene/control/skin/resources/controls";
@@ -50,6 +52,10 @@ public class Dialogs {
 				} catch(MissingResourceException ignore) {}
 			}
 		}
+	}
+
+	public static void setFontSize(double fontSize) {
+		Dialogs.fontSize = fontSize;
 	}
 
 	public static ButtonType showInformation(String message) {
@@ -131,6 +137,21 @@ public class Dialogs {
 			}
 			if(title == null) {
 				title = ((Stage)owner).getTitle();
+			}
+		}
+
+		boolean isWindows = System.getProperty("os.name", "").toLowerCase().startsWith("windows");
+		if(isWindows) {
+			if(fontSize > 0) {
+				dialog.getDialogPane().setStyle("-fx-font-family: Meiryo; -fx-font-size: " + fontSize);
+			} else {
+				dialog.getDialogPane().setStyle("-fx-font-family: Meiryo");
+			}
+		} else {
+			if(fontSize > 0) {
+				dialog.getDialogPane().setStyle("-fx-font-size: " + fontSize);
+			} else {
+				dialog.getDialogPane().setStyle("");
 			}
 		}
 
