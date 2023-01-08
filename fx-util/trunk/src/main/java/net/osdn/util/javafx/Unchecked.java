@@ -1,5 +1,6 @@
 package net.osdn.util.javafx;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
 public class Unchecked {
@@ -51,6 +52,29 @@ public class Unchecked {
 			} else {
 				rethrow(exception);
 			}
+		}
+	}
+
+	/** 戻り値を持つタスクを実行します。
+	 * タスクは try ～ catch(Throwable) 内で実行されるため、チェック例外をスローするコードをそのまま含むことができます。
+	 * タスク実行でキャッチされない例外がスローされると、スレッドのキャッチされない例外ハンドラ（UncaughtExceptionHandler）に転送します。
+	 *
+	 * @param callable 戻り値を持つタスク
+	 * @return タスクの戻り値
+	 * @param <T> タスクの戻り値の型
+	 */
+	public static <T> T execute(Callable<T> callable) {
+		try {
+			return callable.call();
+		} catch(Throwable exception) {
+			Thread thread = Thread.currentThread();
+			Thread.UncaughtExceptionHandler ueh = thread.getUncaughtExceptionHandler();
+			if(ueh != null) {
+				ueh.uncaughtException(thread, exception);
+			} else {
+				rethrow(exception);
+			}
+			return null;
 		}
 	}
 
