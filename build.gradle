@@ -1,22 +1,21 @@
-apply plugin: 'java'
+plugins {
+	id 'java'
+}
 
-archivesBaseName = 'fx-util'
-version = '0.5.0'
+version = '0.6'
 
-tasks.withType(JavaCompile) {
-	sourceCompatibility = 11
-	targetCompatibility = 11
+java {
+	sourceCompatibility = 21
+	targetCompatibility = 21
+}
+
+compileJava {
+	options.encoding = 'UTF-8'
 	options.compilerArgs << '-Xlint:all'
 }
 
-def defaultEncoding = 'UTF-8'
-tasks.withType(AbstractCompile).each { it.options.encoding = defaultEncoding }
-tasks.withType(GroovyCompile).each { it.groovyOptions.encoding = defaultEncoding }
-
-javadoc {
-	options.charSet = 'UTF-8'
-	options.encoding = 'UTF-8'
-	options.stylesheetFile = new File(rootDir, 'javadoc.css')
+sourceSets.main.resources {
+	srcDirs = [ 'src/main/resources', 'src/main/java' ]
 }
 
 repositories {
@@ -31,21 +30,8 @@ dependencies {
 
 defaultTasks 'clean', 'build'
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-	setGroup('build')
-	setDescription('Assembles a jar archive containing the main source code.')
-	archiveClassifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	setGroup('build')
-	setDescription('Generates Javadoc API documentation as a jar archive.')
-	archiveClassifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+jar {
+	manifest {
+		attributes "Specification-Version": "${project.version}"
+	}
 }
