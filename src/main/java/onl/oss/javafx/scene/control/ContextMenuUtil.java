@@ -176,16 +176,21 @@ public class ContextMenuUtil {
 		EventHandler<WindowEvent> newEventHandler = new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
-				Node contextMenuNode = contextMenu.getStyleableNode();
-				for (MenuItem menuItem : contextMenu.getItems()) {
-					Node menuItemNode = menuItem.getStyleableNode();
-					fixImpl(contextMenu, contextMenuNode, menuItem, menuItemNode, hideOnMouseReleased);
+				Object source = event.getSource();
+				if (source instanceof ContextMenu) {
+					ContextMenu contextMenu = (ContextMenu)source;
+
+					Node contextMenuNode = contextMenu.getStyleableNode();
+					for (MenuItem menuItem : contextMenu.getItems()) {
+						Node menuItemNode = menuItem.getStyleableNode();
+						fixImpl(contextMenu, contextMenuNode, menuItem, menuItemNode, hideOnMouseReleased);
+					}
+					// コンテキスト・メニュー表示時になぜか先頭のアイテムが選択状態になることがあるようなので、
+					// コンテキスト・メニュー自体にフォーカス要求を出して、先頭アイテムが初期選択状態にならないようにします。
+					contextMenuNode.requestFocus();
+					contextMenu.removeEventHandler(WindowEvent.WINDOW_SHOWING, this);
+					contextMenuWindowShowingEventHandlers.remove(contextMenu);
 				}
-				// コンテキスト・メニュー表示時になぜか先頭のアイテムが選択状態になることがあるようなので、
-				// コンテキスト・メニュー自体にフォーカス要求を出して、先頭アイテムが初期選択状態にならないようにします。
-				contextMenuNode.requestFocus();
-				contextMenu.removeEventHandler(WindowEvent.WINDOW_SHOWING, this);
-				contextMenuWindowShowingEventHandlers.remove(contextMenu);
 			}
 		};
 		contextMenu.addEventHandler(WindowEvent.WINDOW_SHOWING, newEventHandler);
@@ -221,10 +226,15 @@ public class ContextMenuUtil {
 		EventHandler<MouseEvent> newEventFilter = new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				if(!menuItemNode.isFocused()) {
-					event.consume();
-					if(hideOnMouseReleased) {
-						contextMenu.hide();
+				Object source = event.getSource();
+				if (source instanceof Node) {
+					Node menuItemNode = (Node)source;
+
+					if(!menuItemNode.isFocused()) {
+						event.consume();
+						if(hideOnMouseReleased) {
+							contextMenu.hide();
+						}
 					}
 				}
 			}
