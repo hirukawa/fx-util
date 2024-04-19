@@ -83,7 +83,7 @@ public class HiDpiFixedInputMethodRequests implements InputMethodRequests {
 
 	@Override
 	public Point2D getTextLocation(int offset) {
-		// テキスト入力欄が画面下部（textLocation.getY()から画面下部までが248以下）にあるときIMEの変換候補ウィンドウが上側に表示されます。
+		// テキスト入力欄が画面下部にあるときIMEの変換候補ウィンドウが上側に表示されます。
 		// 上側に変換候補ウィンドウが表示されるときは Y座標を -15 しています。
 		Point2D textLocation = inputMethodRequests.getTextLocation(offset);
 		double x = textLocation.getX();
@@ -95,14 +95,46 @@ public class HiDpiFixedInputMethodRequests implements InputMethodRequests {
 		} else {
 			screen = Screen.getPrimary();
 		}
+
+		y = Math.ceil(y);
 		double diff = screen.getBounds().getMaxY() - y;
-		if(diff <= 248d) {
-			if(diff < 248d - 15d) {
-				y -= 15d;
-			} else {
-				y -= (248d - diff);
+
+		//
+		// Windows 10 と Windows 11 では IME変換ウィンドウの高さが異なります。
+		// Windows 10 は IME変換ウィンドウの高さ 162（互換性オンで以前のバージョンのIMEを使うと高さ192。これには対応しません）
+		// Windows 11 は IME 変換ウィンドウの高さ 192
+		//
+		// Windows 10 と Windows 11 では IME変換ウィンドウがタスクバーに重なる高さが異なります。
+		// Windows 10 はタスクバーの高さ全体に IMEウィンドウが重なります。
+		// Windows 11 はタスクバーの高さ上部 12px までしか IMEウィンドウが重なりません。（下部36pxには IMEウィンドウが重ならない）
+		//
+		String os = System.getProperty("os.name", "").toLowerCase();
+		if (os.contains("windows 10")) {
+			if (diff < 164) {
+				if (diff < 147) {
+					y -= 15;
+				} else {
+					y -= 195;
+				}
+			}
+		} else if (os.contains("windows 11")) {
+			if (diff < 234) {
+				if (diff < 234 - 15) {
+					y -= 15;
+				} else {
+					y -= 228;
+				}
+			}
+		} else {
+			if (diff < 234) {
+				if (diff < 234 - 15) {
+					y -= 15;
+				} else {
+					y -= 228;
+				}
 			}
 		}
+
 		textLocation = new Point2D(x, y);
 		return textLocation.multiply(getScale());
 	}

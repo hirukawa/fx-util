@@ -85,7 +85,6 @@ public class SceneUtil {
 
 		new Timeline(new KeyFrame(timeout, event -> {
 			if (!isComplated[0]) {
-				System.out.println("SceneUtil.invokeAfterLayout: timeout: node=" + parent);
 				isComplated[0] = true;
 				scene.removePostLayoutPulseListener(postLayoutPulseListener);
 				scene.removePreLayoutPulseListener(preLayoutPulseListener);
