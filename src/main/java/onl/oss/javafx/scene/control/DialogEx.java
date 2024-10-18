@@ -15,8 +15,9 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-public final class DialogEx<R> extends Dialog<R> {
+public class DialogEx<R> extends Dialog<R> {
 
+	@SuppressWarnings("this-escape")
 	public DialogEx(Window owner) {
 		if(owner instanceof Stage) {
 			Stage stage = (Stage)getDialogPane().getScene().getWindow();
